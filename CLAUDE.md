@@ -37,6 +37,10 @@ names, so don't rename them.
 - `pnpm test` passes with no test files, so a new package doesn't need a placeholder test.
 - `pnpm license-check` fails on any production dependency whose license isn't on the allowlist in
   `scripts/check-licenses.mjs`. Widening the allowlist needs an ADR.
+- The `codeql` and `secret-scan` workflows add the jobs `codeql (javascript-typescript)`,
+  `codeql (actions)` and `secret-scan`. They have no local command, and their names are just as
+  stable. The `codeql` jobs pass even when they find alerts, so branch protection must also
+  require GitHub's `CodeQL` check, which fails on new alerts. See ADR 0002.
 
 ## Conventions
 

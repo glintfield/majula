@@ -11,6 +11,7 @@ Roadmap job 1.2 adds `template.md`.
 
 ## Index
 
-| ADR                       | Title     | Status   |
-| ------------------------- | --------- | -------- |
-| [0001](0001-toolchain.md) | Toolchain | Accepted |
+| ADR                         | Title       | Status   |
+| --------------------------- | ----------- | -------- |
+| [0001](0001-toolchain.md)   | Toolchain   | Accepted |
+| [0002](0002-security-ci.md) | Security CI | Accepted |
