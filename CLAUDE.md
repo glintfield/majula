@@ -9,6 +9,8 @@ strict) on Node 22.
   extends the strict root `tsconfig.base.json`.
 - `proto/`: placeholder for the API schema until job 1.6 picks the tooling. Don't add codegen.
 - `docs/adr/`: architecture decision records. See `docs/adr/README.md`.
+- `docs/policy/`: policies Majula's code must follow. `agent-terms.md` says which runtime
+  credentials, logins and usage sources are allowed.
 - `scripts/`: repo tooling (`check-licenses.mjs`).
 
 ## Setup
