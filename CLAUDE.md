@@ -11,6 +11,8 @@ strict) on Node 22.
 - `docs/adr/`: architecture decision records. See `docs/adr/README.md`.
 - `docs/policy/`: policies Majula's code must follow. `agent-terms.md` says which runtime
   credentials, logins and usage sources are allowed.
+- `docs/threat-model.md`: assets, trust boundaries, attackers and security invariants. Design docs
+  cite its IDs.
 - `scripts/`: repo tooling (`check-licenses.mjs`).
 
 ## Setup
