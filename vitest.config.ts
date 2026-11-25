@@ -4,6 +4,6 @@ export default defineConfig({
   test: {
     passWithNoTests: true,
     include: ['**/*.test.ts', 'scripts/**/*.test.mjs'],
-    exclude: ['**/node_modules/**', '**/dist/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', 'spike/**'],
   },
 });
