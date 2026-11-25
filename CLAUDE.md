@@ -1,0 +1,43 @@
+# CLAUDE.md
+
+Majula's server repo: server, CLI, protocol schema and ADRs. pnpm workspace, TypeScript (ESM,
+strict) on Node 22.
+
+## Layout
+
+- `server/` (`@majula/server`), `cli/` (`@majula/cli`): workspace packages. Each `tsconfig.json`
+  extends the strict root `tsconfig.base.json`.
+- `proto/`: placeholder for the API schema until job 1.6 picks the tooling. Don't add codegen.
+- `docs/adr/`: architecture decision records. See `docs/adr/README.md`.
+- `scripts/`: repo tooling (`check-licenses.mjs`).
+
+## Setup
+
+```sh
+corepack enable
+pnpm install
+```
+
+`engineStrict` is on, so installs fail on any Node other than 22.
+
+## The CI gate
+
+Run all five before pushing. CI runs each as its own job, and branch protection requires the job
+names, so don't rename them.
+
+| Command              | CI job          |
+| -------------------- | --------------- |
+| `pnpm lint`          | `lint`          |
+| `pnpm format`        | `format`        |
+| `pnpm typecheck`     | `typecheck`     |
+| `pnpm test`          | `test`          |
+| `pnpm license-check` | `license-check` |
+
+- `pnpm format:fix` fixes formatting.
+- `pnpm test` passes with no test files, so a new package doesn't need a placeholder test.
+- `pnpm license-check` fails on any production dependency whose license isn't on the allowlist in
+  `scripts/check-licenses.mjs`. Widening the allowlist needs an ADR.
+
+## Conventions
+
+- Record architecture and tooling choices as an ADR in `docs/adr/`.
