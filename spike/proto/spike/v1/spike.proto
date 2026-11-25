@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package spike.v1;
+
+service SpikeService {
+  rpc Echo(EchoRequest) returns (EchoResponse);
+  rpc Watch(WatchRequest) returns (stream Event);
+}
+
+message EchoRequest {
+  string message = 1;
+}
+
+message EchoResponse {
+  string message = 1;
+}
+
+message WatchRequest {
+  // Unset streams live events only; set resumes with the event after this seq.
+  optional uint64 after_seq = 1;
+}
+
+message Event {
+  uint64 seq = 1;
+  string payload = 2;
+}
