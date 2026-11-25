@@ -7,7 +7,7 @@ decision listed here.
 Files are named `NNNN-kebab-title.md` and numbered in order. Numbers are never reused or changed.
 A superseded ADR stays in place with its status set to "Superseded by NNNN".
 
-Roadmap job 1.2 adds `template.md`.
+To write a new ADR, copy [`template.md`](template.md) and follow the note at its top.
 
 ## Index
 
