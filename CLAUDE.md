@@ -13,6 +13,8 @@ strict) on Node 22.
   credentials, logins and usage sources are allowed.
 - `docs/threat-model.md`: assets, trust boundaries, attackers and security invariants. Design docs
   cite its IDs.
+- `docs/spec-template.md`: the template every design doc copies, including a Security section
+  filled in against the threat model.
 - `scripts/`: repo tooling (`check-licenses.mjs`).
 
 ## Setup
@@ -49,3 +51,5 @@ names, so don't rename them.
 ## Conventions
 
 - Record architecture and tooling choices as an ADR in `docs/adr/`.
+- Write a design doc by copying `docs/spec-template.md` to `docs/design/`. Spikes and steps
+  marked _(no design doc)_ skip it.
