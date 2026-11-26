@@ -1,2 +1,7 @@
 certs/
 node_modules/
+apple/.build/
+apple/SpikeClient/.build/
+apple/SpikeClient/.swiftpm/
+xcuserdata/
+*.xcuserstate
