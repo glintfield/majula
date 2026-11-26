@@ -3,5 +3,10 @@ node_modules/
 apple/.build/
 apple/SpikeClient/.build/
 apple/SpikeClient/.swiftpm/
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
 xcuserdata/
 *.xcuserstate
