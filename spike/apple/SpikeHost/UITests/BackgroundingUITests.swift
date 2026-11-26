@@ -5,7 +5,7 @@ final class BackgroundingUITests: XCTestCase {
   func testResumesAfterBackgrounding() throws {
     let env = ProcessInfo.processInfo.environment
     let app = XCUIApplication()
-    for key in ["SPIKE_URL", "SPIKE_TOKEN", "SPIKE_CA_DER_B64"] {
+    for key in ["SPIKE_URL", "SPIKE_CA_DER_B64", "SPIKE_TOKEN"] {
       guard let value = env[key] else { throw XCTSkip("\(key) unset: run spike/apple/scripts/test.sh") }
       app.launchEnvironment[key] = value
     }
