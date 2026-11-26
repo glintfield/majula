@@ -6,7 +6,7 @@ iPhone and Android pair with it. It is built from Outpost, a personal tool, and 
 be installable and usable by anybody.
 
 This repo holds the server, the CLI, the protocol schema and the design records. The apps live in
-`glintfield/majula-apple` and `glintfield/majula-android`.
+`noctana/majula-apple` and `noctana/majula-android`.
 
 ## Layout
 
