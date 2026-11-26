@@ -11,7 +11,8 @@ To write a new ADR, copy [`template.md`](template.md) and follow the note at its
 
 ## Index
 
-| ADR                         | Title       | Status   |
-| --------------------------- | ----------- | -------- |
-| [0001](0001-toolchain.md)   | Toolchain   | Accepted |
-| [0002](0002-security-ci.md) | Security CI | Accepted |
+| ADR                         | Title                 | Status   |
+| --------------------------- | --------------------- | -------- |
+| [0001](0001-toolchain.md)   | Toolchain             | Accepted |
+| [0002](0002-security-ci.md) | Security CI           | Accepted |
+| [0003](0003-api-schema.md)  | API schema technology | Accepted |
