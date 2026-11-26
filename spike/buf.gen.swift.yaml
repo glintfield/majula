@@ -1,0 +1,11 @@
+version: v2
+plugins:
+  - remote: buf.build/apple/swift:v1.41.0
+    out: apple/SpikeClient/Sources/SpikeClient/Generated
+    opt: Visibility=Public
+  - remote: buf.build/connectrpc/swift:v1.2.3
+    out: apple/SpikeClient/Sources/SpikeClient/Generated
+    opt:
+      - Visibility=Public
+      - GenerateAsyncMethods=true
+      - GenerateCallbackMethods=false

@@ -67,8 +67,9 @@ pinned the old leaf breaks.
 npm --prefix spike run generate
 ```
 
-`buf.gen.yaml` writes TypeScript to `gen/ts/`, which is committed. The Swift and Kotlin steps add
-their own plugin entries to `buf.gen.yaml`, with `out` pointing into their own repos.
+`buf.gen.yaml` writes TypeScript to `gen/ts/`, which is committed. Swift has its own template,
+`buf.gen.swift.yaml` (`npm --prefix spike run generate:swift`), so regenerating TypeScript needs no
+Swift plugins.
 
 ## Tests
 
@@ -78,3 +79,5 @@ npm --prefix spike test
 
 The tests start the server on a random port with a temporary CA. They cover the unary call, auth
 rejection, streaming, gap-free resume and leaf rotation.
+
+The Swift client and its tests are in `apple/`. See `apple/README.md`.
