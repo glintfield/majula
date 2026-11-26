@@ -69,7 +69,7 @@ npm --prefix spike run generate
 
 `buf.gen.yaml` writes TypeScript to `gen/ts/`, which is committed. Swift has its own template,
 `buf.gen.swift.yaml` (`npm --prefix spike run generate:swift`), so regenerating TypeScript needs no
-Swift plugins.
+Swift plugins. Kotlin likewise has `buf.gen.kotlin.yaml` (`npm --prefix spike run generate:kotlin`).
 
 ## Tests
 
@@ -80,4 +80,5 @@ npm --prefix spike test
 The tests start the server on a random port with a temporary CA. They cover the unary call, auth
 rejection, streaming, gap-free resume and leaf rotation.
 
-The Swift client and its tests are in `apple/`. See `apple/README.md`.
+The Swift client and its tests are in `apple/`. See `apple/README.md`. The Kotlin client and its
+tests are in `android/`. See `android/README.md`.

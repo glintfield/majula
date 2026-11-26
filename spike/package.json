@@ -8,6 +8,7 @@
   "scripts": {
     "generate": "buf generate",
     "generate:swift": "buf generate --template buf.gen.swift.yaml",
+    "generate:kotlin": "buf generate --template buf.gen.kotlin.yaml",
     "start": "tsx server/main.ts",
     "test": "vitest run",
     "typecheck": "tsc",
