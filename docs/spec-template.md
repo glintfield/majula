@@ -35,11 +35,11 @@ from the roadmap._
 
 _The design, from scratch._
 
-### Data model and tenancy
+### Data model
 
-_Records added or changed. Every record carries `workspaceId` and an owner `userId`. Say whether
-each credential or integration is scoped `workspace` or `user`, and where the acting user is
-recorded apart from the owner (I12)._
+_Records added or changed, with their ID prefixes (ADR 0006). Records carry no tenant or owner
+columns: a server serves one person. Name the commands and approvals that record the acting device
+(I11)._
 
 ### API and contract changes
 

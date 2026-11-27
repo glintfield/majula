@@ -1,7 +1,7 @@
 # Threat model
 
 - Status: Living document
-- Date: 2026-11-25
+- Date: 2026-11-26
 
 This is the threat model every Majula design is checked against. It names what we protect (assets),
 where trust changes (boundaries), who attacks (attackers) and the properties every design must keep
@@ -19,8 +19,7 @@ adds an asset, a boundary or an attacker updates this document in the same PR.
 ## 1. Scope and system sketch
 
 Majula is a server that runs agent sessions as jobs with human gates, and native clients that drive
-it. v1 has two deployment shapes from one codebase: personal (server on a laptop or one box, local
-SQLite) and team-ready (server somewhere shared, remote Postgres).
+it. A server serves one person, on a laptop, a home box or a cloud VM, with a local SQLite database.
 
 - **Clients.** SwiftUI for Mac and iPhone, Kotlin and Jetpack Compose for Android. All three
   generate their API code from one schema and render presentation-ready data the server sends.
@@ -28,12 +27,14 @@ SQLite) and team-ready (server somewhere shared, remote Postgres).
   (`brew services`) on macOS; it also runs on Linux.
 - **Agent runtimes.** Claude on the Agent SDK (in-process hooks), Codex, Cursor and generic ACP
   agents. The server detects the runtimes the user has installed and never bundles one.
-- **Database.** SQLite (personal) or Postgres (team-ready, possibly on another host).
+- **Database.** SQLite, a local file on the server host.
 - **External services.** GitHub; the job sources Linear, Slack, Jira and Monday; MCP servers; model
   providers.
-- **Tenancy.** Every record carries a `workspaceId` and an owner `userId`. Credentials and
-  integrations are scoped to a workspace or a user. v1 ships exactly one of each. "Workspace" always
-  means the tenant; an agent's isolated git copy is a **checkout**.
+- **One person per server.** A server serves exactly one person, permanently (the roadmap's "One
+  person per server"). Records carry no tenant or owner columns, and commands and approvals record
+  the device that acted ([ADR 0006](adr/0006-ids.md)). People share work through GitHub, Linear and
+  Slack, never a shared server. An agent's isolated git copy is a **checkout**; a client's entry
+  for one paired server is a **server profile**.
 - **Not in v1.** A push relay, a hosted Majula service and sessions on a machine other than the
   server's. Each would add a boundary, and must update this document when it arrives.
 
@@ -97,12 +98,8 @@ SQLite) and team-ready (server somewhere shared, remote Postgres).
   the server process it owns everything (see §8), so the property is keeping it out. Inside a
   session it equals T2 with code execution. As an MCP server it receives credentials and returns
   untrusted output. Reaches B1, B2 and B3.
-- **T5 Another user in team mode.** An authenticated member of the same workspace, or of another
-  workspace on a shared server. Tries to read others' jobs and transcripts, use another user's
-  credentials, approve or message another user's sessions, act in another workspace, or change
-  shared actions and permission groups to affect others. v1 ships one user, but these properties
-  must hold structurally. Reaches B1, and B2, B3, B4 and B5 through the server and the sessions it
-  starts.
+- **T5 Another user in team mode.** Retired by [ADR 0006](adr/0006-ids.md). A server serves one
+  person, so no second user authenticates to it. Another person holding a paired device is T1.
 
 ### Prompt-injection capabilities (T2.1–T2.14)
 
@@ -161,13 +158,13 @@ design doc: a source of requirements, not a suite to port.
 Each cell names the invariants (§6) that must hold where that attacker meets that boundary, and any
 residual risk (§7) that weakens one there. `—` means the attacker can't reach the boundary.
 
-|     | B1 client↔server                               | B2 server↔agent                     | B3 agent↔external | B4 server↔DB                    | B5 server↔external            |
-| --- | ---------------------------------------------- | ----------------------------------- | ----------------- | ------------------------------- | ----------------------------- |
-| T1  | I8, I10, I11 (presence to approve)             | I5, I11 (Bypass needs presence)     | —                 | —                               | —                             |
-| T2  | I2 (full payload shown), I16 (inert rendering) | I1, I3, I4, I5, I6, I13, R2         | I2, I7, I15, R1   | I14 (no DB reach from sessions) | I16 (intake content is data)  |
-| T3  | I8, I9                                         | —                                   | I9                | I9, I14                         | I8 (signed webhooks), I9, I15 |
-| T4  | I17                                            | I1, I3 (bounded by the session), R1 | I7, I16           | —                               | —                             |
-| T5  | I8, I12                                        | I5 (owner-only Bypass), I12         | I7, I12           | I12                             | I12                           |
+|              | B1 client↔server                               | B2 server↔agent                     | B3 agent↔external | B4 server↔DB                    | B5 server↔external            |
+| ------------ | ---------------------------------------------- | ----------------------------------- | ----------------- | ------------------------------- | ----------------------------- |
+| T1           | I8, I10, I11 (presence to approve)             | I5, I11 (Bypass needs presence)     | —                 | —                               | —                             |
+| T2           | I2 (full payload shown), I16 (inert rendering) | I1, I3, I4, I5, I6, I13, R2         | I2, I7, I15, R1   | I14 (no DB reach from sessions) | I16 (intake content is data)  |
+| T3           | I8, I9                                         | —                                   | I9                | I9, I14                         | I8 (signed webhooks), I9, I15 |
+| T4           | I17                                            | I1, I3 (bounded by the session), R1 | I7, I16           | —                               | —                             |
+| T5 (retired) | —                                              | —                                   | —                 | —                               | —                             |
 
 ## 6. Security invariants
 
@@ -189,9 +186,9 @@ for this document, and its §10 lists the invariant suite cited below.
   control-plane §10 (x); T2.6, T2.8.)
 - **I4 Escape corpus.** Every T2.n capability is refused, except ACP reads while R2 stands. Job 3.2
   turns this list into failing tests. (Anti-goal.)
-- **I5 Bypass is the only exception.** Only the session's owning user, from a client, turns Bypass
-  on, for one session. A planner, controller or agent never can. The session shows it plainly, and
-  Bypass doesn't outlive the session. Job 1.8 owns the design. (Anti-goal.)
+- **I5 Bypass is the only exception.** Only the user, from a client, turns Bypass on, for one
+  session. A planner, controller or agent never can. The session shows it plainly, and Bypass
+  doesn't outlive the session. Job 1.8 owns the design. (Anti-goal.)
 - **I6 No self-escalation.** No agent changes A10, pre-approvals or permission modes. Any change
   that widens a grant needs an authenticated user decision, and a write-shaped rule can't land in an
   ungated grant. (Control-plane §10 (vii); T2.11, T2.14.)
@@ -208,12 +205,11 @@ for this document, and its §10 lists the invariant suite cited below.
 - **I10 Revocation.** A device credential can be revoked from another device or the server's CLI.
   Revocation takes effect on the next request and on open streams.
 - **I11 Approval provenance.** Every approval, gate decision, Bypass toggle and permission change
-  records the acting user and device and is bound to exactly what was decided, so it can't be
-  replayed onto another draft. A stolen device credential can't be used off the device, and
-  approving or widening a grant needs user presence on the device.
-- **I12 Tenant isolation.** Every read and write is scoped by `workspaceId`. A user-scoped
-  credential is used only in that user's work. Approving or messaging a session needs a user the
-  workspace permits. The acting user is recorded separately from the owner.
+  records the acting device and is bound to exactly what was decided, so it can't be replayed onto
+  another draft. A stolen device credential can't be used off the device, and approving or widening
+  a grant needs user presence on the device.
+- **I12 Tenant isolation.** Retired by [ADR 0006](adr/0006-ids.md): records carry no tenant or
+  owner columns, since a server serves one person. Recording the device that acted is I11.
 - **I13 Local callback channel.** Every endpoint an agent or another host process can reach
   authenticates the calling session and acts only on that session's own step. It is never reachable
   off-host. Identifiers that reach a path or argv are validated against strict patterns. (T2.5,
