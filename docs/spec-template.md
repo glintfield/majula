@@ -39,7 +39,8 @@ _The design, from scratch._
 
 _Records added or changed, with their ID prefixes (ADR 0006). Records carry no tenant or owner
 columns: a server serves one person. Name the commands and approvals that record the acting device
-(I11)._
+(I11). Say which fields are columns and which are JSON, and give each list query's order key and
+index (ADR 0008)._
 
 ### API and contract changes
 
