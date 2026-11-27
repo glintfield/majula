@@ -24,3 +24,4 @@ To write a new ADR, copy [`template.md`](template.md) and follow the note at its
 | [0009](0009-transcript-store.md)         | Transcript store          | Accepted |
 | [0010](0010-subscriptions-cursors.md)    | Subscriptions and cursors | Accepted |
 | [0011](0011-api-conventions.md)          | API conventions           | Accepted |
+| [0012](0012-node-interface.md)           | Node interface            | Accepted |

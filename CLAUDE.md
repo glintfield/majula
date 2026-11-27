@@ -7,6 +7,9 @@ strict) on Node 22.
 
 - `server/` (`@majula/server`), `cli/` (`@majula/cli`): workspace packages. Each `tsconfig.json`
   extends the strict root `tsconfig.base.json`.
+- `server/src/`: core, except `storage/`, `host/` and `local-node/`, which alone may import file,
+  process, SQLite or runtime modules, as `eslint.config.js` enforces. Core reaches git, checkouts,
+  repo files, processes and runtimes only through the node interface (ADR 0012).
 - `proto/`: the API schema, Protobuf with Connect RPC built with buf (ADR 0003). There's no schema
   yet. Don't add codegen until a later job adds the first one.
 - `docs/adr/`: architecture decision records. See `docs/adr/README.md`.
