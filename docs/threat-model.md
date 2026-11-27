@@ -50,7 +50,8 @@ it. A server serves one person, on a laptop, a home box or a cloud VM, with loca
   approved agent call or the server's own outbox, not only by holding a token. Integrity.
 - **A5 Source-integration and MCP credentials.** Linear, Slack, Jira, Monday and MCP OAuth tokens,
   and the write authority they carry. Confidentiality and integrity.
-- **A6 Client credentials.** Device keys, session tokens and pairing codes. Confidentiality.
+- **A6 Client credentials.** Device keys, presence keys, access tokens and pairing secrets.
+  Confidentiality.
 - **A7 Server identity.** The server's long-lived key or private CA, and the key that encrypts
   secrets at rest. Confidentiality.
 - **A8 Approvals and grants of authority.** Approvals, write pins, pre-approvals, permission modes
@@ -81,6 +82,9 @@ it. A server serves one person, on a laptop, a home box or a cloud VM, with loca
   structured writes from its outbox (open or merge a PR, post a reply, source writebacks) and usage
   polling. It is separate from B3 because the server, not an agent, holds these credentials and
   originates these writes.
+- **B6 Profile ↔ profile.** The server profiles inside one client app: each profile's keys, tokens,
+  trust anchor, cache, settings and the calls bound to it. A client pairs with several servers and
+  keeps them apart ([ADR 0019](adr/0019-pairing-profiles.md)).
 
 ## 4. Attackers
 
@@ -103,6 +107,10 @@ it. A server serves one person, on a laptop, a home box or a cloud VM, with loca
   untrusted output. Reaches B1, B2 and B3.
 - **T5 Another user in team mode.** Retired by [ADR 0006](adr/0006-ids.md). A server serves one
   person, so no second user authenticates to it. Another person holding a paired device is T1.
+- **T6 Hostile co-paired server.** A server the same app is also paired with, compromised or run by
+  someone else. It controls everything that server sends, including its pairing payloads. Targets
+  A6 and A9 of the app's other profiles, and impersonating another server to the app. Reaches B1
+  (its own) and B6.
 
 ### Prompt-injection capabilities (T2.1–T2.14)
 
@@ -161,13 +169,14 @@ design doc: a source of requirements, not a suite to port.
 Each cell names the invariants (§6) that must hold where that attacker meets that boundary, and any
 residual risk (§7) that weakens one there. `—` means the attacker can't reach the boundary.
 
-|              | B1 client↔server                               | B2 server↔agent                     | B3 agent↔external | B4 server↔DB                    | B5 server↔external            |
-| ------------ | ---------------------------------------------- | ----------------------------------- | ----------------- | ------------------------------- | ----------------------------- |
-| T1           | I8, I10, I11 (presence to approve)             | I5, I11 (Bypass needs presence)     | —                 | —                               | —                             |
-| T2           | I2 (full payload shown), I16 (inert rendering) | I1, I3, I4, I5, I6, I13, R2         | I2, I7, I15, R1   | I14 (no DB reach from sessions) | I16 (intake content is data)  |
-| T3           | I8, I9                                         | —                                   | I9                | —                               | I8 (signed webhooks), I9, I15 |
-| T4           | I17                                            | I1, I3 (bounded by the session), R1 | I7, I16           | —                               | —                             |
-| T5 (retired) | —                                              | —                                   | —                 | —                               | —                             |
+|              | B1 client↔server                               | B2 server↔agent                     | B3 agent↔external | B4 server↔DB                    | B5 server↔external            | B6 profile↔profile           |
+| ------------ | ---------------------------------------------- | ----------------------------------- | ----------------- | ------------------------------- | ----------------------------- | ---------------------------- |
+| T1           | I8, I10, I11 (presence to approve)             | I5, I11 (Bypass needs presence)     | —                 | —                               | —                             | I11 (separate presence keys) |
+| T2           | I2 (full payload shown), I16 (inert rendering) | I1, I3, I4, I5, I6, I13, R2         | I2, I7, I15, R1   | I14 (no DB reach from sessions) | I16 (intake content is data)  | I16, I18                     |
+| T3           | I8, I9                                         | —                                   | I9                | —                               | I8 (signed webhooks), I9, I15 | —                            |
+| T4           | I17                                            | I1, I3 (bounded by the session), R1 | I7, I16           | —                               | —                             | —                            |
+| T5 (retired) | —                                              | —                                   | —                 | —                               | —                             | —                            |
+| T6           | I9, I18                                        | —                                   | —                 | —                               | —                             | I18                          |
 
 ## 6. Security invariants
 
@@ -228,6 +237,10 @@ for this document, and its §10 lists the invariant suite cited below.
 - **I17 Supply chain.** A dependency change reaches `main` only through a reviewed PR that passes
   the CI gate (ADR 0001, 0002). Release artifacts (Homebrew bottle, notarized Mac app, store builds)
   are verifiable against published checksums or signatures.
+- **I18 Profile isolation.** No key, token, trust anchor, cursor, cache entry, setting or
+  identifier of one server profile reaches another server or is used for another profile's calls.
+  Each profile anchors only on its own server's CA, and no stable identifier is sent to more than
+  one server.
 
 ## 7. Known residual risks
 
@@ -237,7 +250,9 @@ spec.
 - **R1 Build and test execution.** A session granted build or test commands runs code it just wrote
   in its checkout. That code can do anything the session's OS user can, including use a credential
   in its environment to make an external write that never reaches the gate, so I2 holds only for
-  writes shaped as a tool call the gate can inspect. (Outpost `deferred.md`.)
+  writes shaped as a tool call the gate can inspect. It can also read the server's host secret
+  and pair a device of its own, which reaches A8 ([ADR 0020](adr/0020-device-credentials.md)).
+  (Outpost `deferred.md`.)
 - **R2 Ungated reads on ACP runtimes.** ACP agents read without asking, so I3's read scope isn't
   enforced there, and external writes are refused for them. (Outpost `permissions.md`.)
 
