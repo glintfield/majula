@@ -19,7 +19,7 @@ adds an asset, a boundary or an attacker updates this document in the same PR.
 ## 1. Scope and system sketch
 
 Majula is a server that runs agent sessions as jobs with human gates, and native clients that drive
-it. A server serves one person, on a laptop, a home box or a cloud VM, with a local SQLite database.
+it. A server serves one person, on a laptop, a home box or a cloud VM, with local SQLite files.
 
 - **Clients.** SwiftUI for Mac and iPhone, Kotlin and Jetpack Compose for Android. All three
   generate their API code from one schema and render presentation-ready data the server sends.
@@ -27,7 +27,8 @@ it. A server serves one person, on a laptop, a home box or a cloud VM, with a lo
   (`brew services`) on macOS; it also runs on Linux.
 - **Agent runtimes.** Claude on the Agent SDK (in-process hooks), Codex, Cursor and generic ACP
   agents. The server detects the runtimes the user has installed and never bundles one.
-- **Database.** SQLite, a local file on the server host.
+- **Database.** SQLite: the domain database and the transcript store, local files on the server
+  host.
 - **External services.** GitHub; the job sources Linear, Slack, Jira and Monday; MCP servers; model
   providers.
 - **One person per server.** A server serves exactly one person, permanently (the roadmap's "One
@@ -72,8 +73,10 @@ it. A server serves one person, on a laptop, a home box or a cloud VM, with a lo
 - **B3 Agent ↔ external services.** Calls an agent makes mid-turn: `git push`, `gh`, MCP tools, web
   fetches and model-provider traffic. Credentials cross outward; untrusted content (repo files,
   tickets, comments, web pages, MCP output) crosses inward.
-- **B4 Server ↔ database.** A local SQLite file on the server host, per
-  [ADR 0008](adr/0008-storage-shape.md). Every asset at rest crosses it, credentials included.
+- **B4 Server ↔ database.** Local SQLite files on the server host: the domain database
+  ([ADR 0008](adr/0008-storage-shape.md)) and the transcript store
+  ([ADR 0009](adr/0009-transcript-store.md)). Every asset at rest crosses it, credentials
+  included.
 - **B5 Server ↔ external services.** The server's own calls: polling sources, webhook intake,
   structured writes from its outbox (open or merge a PR, post a reply, source writebacks) and usage
   polling. It is separate from B3 because the server, not an agent, holds these credentials and
