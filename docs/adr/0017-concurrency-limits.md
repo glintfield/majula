@@ -111,8 +111,8 @@ the taper's curve (job 4.2), or pairing redemption's rate limit (job 1.7).
 
 ## Alternatives
 
-- **Outpost's in-memory queue.** A restart loses every parked launch and the override, against ADR
-  0007.
+- **Outpost's in-memory queue.** A restart loses every parked launch and the override, against
+  ADR 0007.
 - **One global limit only.** One runtime's account limit would hold back launches on the others.
 - **No cap on live processes.** Idle sessions would hold memory for as long as their jobs wait.
 - **Refusing `session` and `server` commands when the queue is full.** An effect's result could be
