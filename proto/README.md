@@ -5,4 +5,7 @@ The client/server API schema will live here, as Protobuf served with Connect RPC
 server, and BSR remote plugins pinned to exact versions for the Swift and Kotlin clients.
 Generated code is committed. Where the client code is generated and packaged is job 2.3's.
 
+Packages, versioning, errors, pagination, the API level and the `buf breaking` rule follow
+[ADR 0011](../docs/adr/0011-api-conventions.md).
+
 There's no schema, `buf.yaml` or codegen here yet. A later job adds the first schema.
