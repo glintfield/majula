@@ -80,13 +80,12 @@ retention policy), or what is redacted (the retention and redaction policy).
   transcript or its lowest-seq prefix, so every remaining `(transcriptId, seq)` the domain
   database cites names the item it always named.
 - **Backup and restore treat the two files as a pair** (job 2.1). If the store still comes back
-  older than the domain database, then before the store serves reads, the writer:
+  older than the domain database, a recovery walks the domain database in capped keyset pages, as
+  a maintenance sweep under ADR 0008. Job 3.1 designs it, including how the highest cited seq is
+  found. Before the store serves reads, the writer:
   - re-applies every transcript deletion and redaction the domain database records;
   - resumes each transcript above the highest seq the domain database cites for it, and records
     that resume floor, so no cited seq names a new item.
-
-  This recovery walks the domain database in capped keyset pages, as a maintenance sweep under
-  ADR 0008. Job 3.1 designs it, including how the highest cited seq is found.
 
 ### References from domain records
 
@@ -145,7 +144,7 @@ retention policy), or what is redacted (the retention and redaction policy).
   runtime's live event stream, across the node interface, not by reading those files, apart from
   the cases below. The runtime keeps its file as its own resume state, and Majula doesn't edit it
   in v1.
-- Majula reads a runtime's file only in these cases:
+- Majula reads a runtime's file only in these cases (the runtime also reads it to resume):
   1. **Import.** dc imports a session started outside Majula, by a device command. The writer
      copies it once, in bounded chunks, parsing it as untrusted data (I16). From then on the
      store's copy is authoritative, and later changes to the file aren't followed. Job 3.6
@@ -153,8 +152,6 @@ retention policy), or what is redacted (the retention and redaction policy).
   2. **Crash backfill.** On resuming a session after a server crash, the adapter may append
      items the runtime's file has and the store missed. `itemKey` drops the overlap. Job 3.1
      decides whether to do it.
-
-  The runtime also reads its own file to resume.
 - The retention and redaction policy decides whether Majula ever deletes or rewrites runtime
   files. A session's record keeps the runtime's session ID, which locates the file.
 - **An adapter's debug logs aren't transcripts.** If job 3.1 keeps native runtime frames for
