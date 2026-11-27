@@ -19,3 +19,4 @@ To write a new ADR, copy [`template.md`](template.md) and follow the note at its
 | [0004](0004-gate-state-machine.md)       | Gate state machine       | Accepted |
 | [0005](0005-session-permission-modes.md) | Session permission modes | Accepted |
 | [0006](0006-ids.md)                      | IDs                      | Accepted |
+| [0007](0007-command-event-outbox.md)     | Commands, events, outbox | Accepted |
