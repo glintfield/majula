@@ -72,8 +72,8 @@ it. A server serves one person, on a laptop, a home box or a cloud VM, with a lo
 - **B3 Agent ↔ external services.** Calls an agent makes mid-turn: `git push`, `gh`, MCP tools, web
   fetches and model-provider traffic. Credentials cross outward; untrusted content (repo files,
   tickets, comments, web pages, MCP output) crosses inward.
-- **B4 Server ↔ database.** A local file (SQLite) or a network connection (Postgres). Every asset at
-  rest crosses it, credentials included.
+- **B4 Server ↔ database.** A local SQLite file on the server host, per
+  [ADR 0008](adr/0008-storage-shape.md). Every asset at rest crosses it, credentials included.
 - **B5 Server ↔ external services.** The server's own calls: polling sources, webhook intake,
   structured writes from its outbox (open or merge a PR, post a reply, source writebacks) and usage
   polling. It is separate from B3 because the server, not an agent, holds these credentials and
@@ -90,9 +90,9 @@ it. A server serves one person, on a laptop, a home box or a cloud VM, with a lo
   directly, B4 through the host filesystem, and B1 and B5 through content the server stores and
   clients render. Its capabilities are T2.1–T2.14 below.
 - **T3 Hostile network.** Observes, modifies, replays and drops traffic between clients and the
-  server, between the server or agents and external services, and to a remote database. Can
-  impersonate the server, reach its listening port and probe unauthenticated routes. Targets A6, A7
-  and A9, and A8 by replay. Reaches B1, B3, B4 and B5.
+  server, and between the server or agents and external services. Can impersonate the server,
+  reach its listening port and probe unauthenticated routes. Targets A6, A7 and A9, and A8 by
+  replay. Reaches B1, B3 and B5.
 - **T4 Compromised dependency.** Malicious code in an npm package the server or CLI ships, a client
   library, the Homebrew formula or bottle, an MCP server, or a package installed in a checkout. In
   the server process it owns everything (see §8), so the property is keeping it out. Inside a
@@ -162,7 +162,7 @@ residual risk (§7) that weakens one there. `—` means the attacker can't reach
 | ------------ | ---------------------------------------------- | ----------------------------------- | ----------------- | ------------------------------- | ----------------------------- |
 | T1           | I8, I10, I11 (presence to approve)             | I5, I11 (Bypass needs presence)     | —                 | —                               | —                             |
 | T2           | I2 (full payload shown), I16 (inert rendering) | I1, I3, I4, I5, I6, I13, R2         | I2, I7, I15, R1   | I14 (no DB reach from sessions) | I16 (intake content is data)  |
-| T3           | I8, I9                                         | —                                   | I9                | I9, I14                         | I8 (signed webhooks), I9, I15 |
+| T3           | I8, I9                                         | —                                   | I9                | —                               | I8 (signed webhooks), I9, I15 |
 | T4           | I17                                            | I1, I3 (bounded by the session), R1 | I7, I16           | —                               | —                             |
 | T5 (retired) | —                                              | —                                   | —                 | —                               | —                             |
 
@@ -200,8 +200,7 @@ for this document, and its §10 lists the invariant suite cited below.
   rate-limited and stored hashed. A webhook is accepted only with a valid sender signature.
 - **I9 Authenticated, encrypted transport.** Clients authenticate the server through a pinned
   long-lived key or private CA, never a pinned leaf and never by network position. Every hop to an
-  external service or a remote database verifies TLS, and no grant lets a call turn verification
-  off.
+  external service verifies TLS, and no grant lets a call turn verification off.
 - **I10 Revocation.** A device credential can be revoked from another device or the server's CLI.
   Revocation takes effect on the next request and on open streams.
 - **I11 Approval provenance.** Every approval, gate decision, Bypass toggle and permission change
@@ -216,7 +215,7 @@ for this document, and its §10 lists the invariant suite cited below.
   T2.14.)
 - **I14 Data at rest.** Credentials in the database are encrypted with a key held outside the
   database. Sessions hold no database credential, and the database files are outside every action's
-  file scope. A remote database connection is authenticated and encrypted.
+  file scope.
 - **I15 Idempotent external writes.** A retry or restart never repeats an external write, from the
   outbox or under a pin. Each has an idempotency key and, where the service allows a read-back, an
   already-done check; otherwise it runs at most once. (Control-plane §7.)
@@ -245,8 +244,7 @@ spec.
   Another non-root OS user on the same host is in scope through I13.
 - A malicious or compromised agent runtime binary or model provider. Majula trusts the runtime the
   user installed to report its calls; I1 covers a failing hook, not a lying runtime.
-- A compromised account at GitHub, a job source or another external service, and a compromised
-  database host.
+- A compromised account at GitHub, a job source or another external service.
 - Denial of service, beyond failing closed.
 - A user who approves a harmful write they could read, and anything done in a Bypass session.
 - Physical and side-channel attacks on the server machine.
