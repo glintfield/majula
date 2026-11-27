@@ -25,3 +25,8 @@ To write a new ADR, copy [`template.md`](template.md) and follow the note at its
 | [0010](0010-subscriptions-cursors.md)    | Subscriptions and cursors | Accepted |
 | [0011](0011-api-conventions.md)          | API conventions           | Accepted |
 | [0012](0012-node-interface.md)           | Node interface            | Accepted |
+| [0013](0013-db-migrations.md)            | DB migrations             | Accepted |
+| [0014](0014-retention-redaction.md)      | Retention and redaction   | Accepted |
+| [0015](0015-telemetry.md)                | Telemetry                 | Accepted |
+| [0016](0016-performance-budgets.md)      | Performance budgets       | Accepted |
+| [0017](0017-concurrency-limits.md)       | Concurrency limits        | Accepted |
